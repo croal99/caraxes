@@ -4,6 +4,14 @@ This is supposed to be a simple template rootkit, which can easily be built upon
 
 It allows for syscall hooking with ftrace, has hiding functionality, and has many kernel functions translated to more userspace-like C functions in `src/stdlib.h`.
 
+## Installing
+
+First, make sure you have installed the header libraries for your kernel.
+
+On debian-like systems: `apt-get install linux-headers-$(uname -r)`
+
+On arch-like systems: `pacman -S linux-headers` / `pacman -S linux-zen-headers` etc
+
 After you've edited some of the files, or copied one of the examples (e.g. `cp examples/hooks_kill_backdoor.h src/hooks.h`), you can make and insert the rootkit like so:
 
 ```sh
