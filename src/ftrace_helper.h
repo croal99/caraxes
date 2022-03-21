@@ -244,3 +244,10 @@ void fh_remove_hooks(struct ftrace_hook *hooks, size_t count)
         .function = (_function),	\
         .original = (_original),	\
     }
+
+#define HOOK_NOSYS(_name, _function, _original)	\
+    {					\
+        .name = (_name),	\
+        .function = (_function),	\
+        .original = (_original),	\
+    }
