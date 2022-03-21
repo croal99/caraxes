@@ -22,6 +22,9 @@ long errno = 0;
     #define DEBUG 1
 #endif
 
+#define KiB 1024
+#define MiB 1024 * KiB
+
 #define FIRST_ARG(regs, cast) (cast)regs->di
 #define SECOND_ARG(regs, cast) (cast)regs->si
 #define THIRD_ARG(regs, cast) (cast)regs->dx
