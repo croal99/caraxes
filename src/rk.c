@@ -12,8 +12,9 @@ static int rk_init(void) {
     int err;
     
     err = fh_install_hooks(syscall_hooks, ARRAY_SIZE(syscall_hooks));
-    if (err)
+    if (err){
         return err;
+    }
 
     rk_info("module loaded\n");
 

