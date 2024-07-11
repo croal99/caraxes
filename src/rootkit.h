@@ -9,6 +9,8 @@
 
 static struct list_head *prev_module = NULL;
 
+bool module_is_hidden = false;
+
 struct process_info {
     struct task_struct* task;
     struct tty_struct* tty;
