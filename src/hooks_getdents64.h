@@ -8,7 +8,7 @@
 #include <linux/proc_ns.h>
 
 
-char* MAGIC_WORD = "hide_me";
+extern char* MAGIC_WORD;
 
 
 /* Just so we know what the linux_dirent looks like.

