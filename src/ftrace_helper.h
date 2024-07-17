@@ -151,6 +151,8 @@ int fh_install_hook(struct ftrace_hook *hook)
         return err;
     }
 
+    printk(KERN_DEBUG "installed hook on %s\n", hook->name);
+
     return 0;
 }
 
