@@ -32,6 +32,6 @@ A tip of mine is to always monitor dmesg on insert / remove with `dmesg -w`.
 
 ## Credits
 - **sw1tchbl4d3/generic-linux-rootkit**: forked from https://codeberg.org/sw1tchbl4d3/generic-linux-rootkit
-- **Diamorphine**: this is kind of a frankenstein rootkit made from GLRK and [Diamorphine](https://github.com/m0nad/Diamorphine)
+- **Diamorphine**: `linux_dirent` element removal code from [Diamorphine](https://github.com/m0nad/Diamorphine)
 - `ftrace_helper.h`: https://github.com/ilammy/ftrace-hook, edited to fit as a library instead of a standalone rootkit.
 - https://xcellerator.github.io/posts/linux_rootkits_01/, got me into rootkits and helped me gain most of the knowledge to make this. Much of the code is inspired by the code found here.

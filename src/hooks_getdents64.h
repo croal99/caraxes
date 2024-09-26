@@ -1,3 +1,8 @@
+/**
+The evil() method contains code for linux_direnet element removal from https://github.com/m0nad/Diamorphine,
+see https://github.com/m0nad/Diamorphine/blob/master/LICENSE.txt for further details about license.
+ */
+
 #pragma once
 
 #include "rootkit.h"
