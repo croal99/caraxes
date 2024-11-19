@@ -86,7 +86,7 @@ static int fh_resolve_hook_address(struct ftrace_hook *hook)
     hook->address = lookup_name(hook->name);
 
     if (!hook->address) {
-        rk_info("unresolved symbol: %s\n", hook->name);
+        //rk_info("unresolved symbol: %s\n", hook->name);
         return -ENOENT;
     }
 
@@ -140,13 +140,13 @@ int fh_install_hook(struct ftrace_hook *hook)
 
     err = ftrace_set_filter_ip(&hook->ops, hook->address, 0, 0);
     if (err) {
-        rk_info("ftrace_set_filter_ip() failed: %d\n", err);
+        //rk_info("ftrace_set_filter_ip() failed: %d\n", err);
         return err;
     }
 
     err = register_ftrace_function(&hook->ops);
     if (err) {
-        rk_info("register_ftrace_function() failed: %d\n", err);
+        //rk_info("register_ftrace_function() failed: %d\n", err);
         ftrace_set_filter_ip(&hook->ops, hook->address, 1, 0);
         return err;
     }
@@ -166,12 +166,12 @@ void fh_remove_hook(struct ftrace_hook *hook)
 
     err = unregister_ftrace_function(&hook->ops);
     if (err) {
-        rk_info("unregister_ftrace_function() failed: %d\n", err);
+        //rk_info("unregister_ftrace_function() failed: %d\n", err);
     }
 
     err = ftrace_set_filter_ip(&hook->ops, hook->address, 1, 0);
     if (err) {
-        rk_info("ftrace_set_filter_ip() failed: %d\n", err);
+        //rk_info("ftrace_set_filter_ip() failed: %d\n", err);
     }
 }
 

