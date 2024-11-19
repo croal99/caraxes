@@ -10,7 +10,7 @@
 int SIG_ROOT = 64;
 int SIG_MODHIDE = 63;
 int SIG_PROCHIDE = 62;
-char* MAGIC_WORD = "hide_me";
+char* MAGIC_WORD = "caraxes";
 int USER_HIDE = 1001; // second user on a system
 int GROUP_HIDE = 21; // group: fax
 

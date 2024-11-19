@@ -1,4 +1,4 @@
-obj-m += rk.o
+obj-m += caraxes.o
 KBUILD_CFLAGS += -DDEBUG=1
 
 all:

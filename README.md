@@ -1,34 +1,60 @@
-# generic-linux-rootkit
+# Caraxes
 
-This is supposed to be a simple template rootkit, which can easily be built upon.
+Linux kernel module rootkit for Linux versions 6 and up, tested until Linux 6.11.
 
-It allows for syscall hooking with ftrace, has hiding functionality, and has many kernel functions translated to more userspace-like C functions in `src/stdlib.h`.
+## Features
+
+Hiding of files and processes by name or owner.
+
+## Configuration
+
+Define the magic string a file has to contain to be hidden in `rootkit.h`:`MAGIC_WORD`, default is "caraxes".
+Also define the `USER_HIDE` and `GROUP_HIDE` there, 1001 and 21 (fax) are the defaults respectively,
+if a file/process belongs to either it will be hidden.
+
+### Module Hiding
+
+Optionally uncomment the `hide_module()` in `caraxes.c`, this will unlink the module from the modules list.
+Also the name of the module that you load (`caraxes.ko`) has to contain the magic word (it does by default),
+otherwise it will show up under `/sys/modules`.
+
+### Hook Target
+
+You can optionally switch from `getdents` hooking to `filldir` hooking by commenting and uncommenting the respective lines in `hooks.h`.
 
 ## Installing
 
 First, make sure you have installed the header libraries for your kernel.
-
 On debian-like systems: `apt-get install linux-headers-$(uname -r)`
-
 On arch-like systems: `pacman -S linux-headers` / `pacman -S linux-zen-headers` etc
 
-After you've edited some of the files, or copied one of the examples (e.g. `cp examples/hooks_kill_backdoor.h src/hooks.h`), you can make and insert the rootkit like so:
-
 ```sh
-cd src
 make
-sudo insmod rk.ko
+sudo insmod caraxes.ko
 
 # To remove
-sudo rmmod rk
+sudo rmmod caraxes
 make clean
 ```
 
-Keep in mind that if you hid the rootkit with `hide_module()` that rmmod will not find it, you'll have to somehow signal to the rootkit to unhide itself with `show_module()`.
+Keep in mind that if you hid the rootkit with `hide_module()` that `rmmod` will not find it, you'll have to somehow signal to the rootkit to unhide itself with `show_module()`.
 
-If you somehow get into that situation, and the unhide doesnt work, or the kernel module crashed on rmmod or similar, a restart should do the trick.
+If you somehow get into that situation, and the unhide doesn't work, or the kernel module crashed on `rmmod`or similar, a restart should do the trick.
 
-A tip of mine is to always monitor dmesg on insert / remove with `dmesg -w`.
+## Debugging
+
+The easiest way is to debug is to uncomment the calls to `rk_info` and `printk` or add your own,
+then monitor dmesg on insert / remove with `sudo dmesg -w`.
+
+## Missing Features
+
+#### Open Ports
+
+`/proc/net/{tcp,udp}` list open ports in a single file instead of one by port.
+This can be addressed either by mangling with the `read*` syscalls or with `tcp4_seq_show()` which fills the content of this file.
+Additionally `/sys/class/net` shows statistics of network activity, which could hint to an open port.
+Also `getsockopt` would fail when trying to bind to an open port - we would kind of have to flee, give up our port,
+and start using a different one.
 
 ## Credits
 - **sw1tchbl4d3/generic-linux-rootkit**: forked from https://codeberg.org/sw1tchbl4d3/generic-linux-rootkit
