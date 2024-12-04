@@ -2,9 +2,12 @@
 
 Linux kernel module rootkit for Linux versions 6 and up, tested until Linux 6.11.
 
+![caraxes logo](caraxes_logo.svg)
+
 ## Features
 
-Hiding of files and processes by name or owner.
+* Hide files & directores
+* Hide processes
 
 ## Configuration
 
