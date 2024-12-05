@@ -59,6 +59,12 @@ Additionally `/sys/class/net` shows statistics of network activity, which could 
 Also `getsockopt` would fail when trying to bind to an open port - we would kind of have to flee, give up our port,
 and start using a different one.
 
+## Disclaimer
+
+Caraxes is purely for educational and academic purposes. The software is provided "as is" and the authors are not responsible for any damage or mishaps that may occur during its use.
+
+Do not attempt to use Caraxes to violate the law. Misuse of the provided software and information may result in criminal charges.
+
 ## Credits
 - **sw1tchbl4d3/generic-linux-rootkit**: forked from https://codeberg.org/sw1tchbl4d3/generic-linux-rootkit
 - **Diamorphine**: `linux_dirent` element removal code from [Diamorphine](https://github.com/m0nad/Diamorphine)
