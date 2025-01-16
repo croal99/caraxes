@@ -1,13 +1,13 @@
 # Caraxes
 
-Linux kernel module rootkit for Linux versions 6 and up, tested until Linux 6.11.
+This repository contains the Linux kernel module (LKM) rootkit CARAXES, which stands for Cyber Analytics Rootkit for Automated and eXploratory Evaluation Scenarios. The rootkit can be used to hide files, directories, and processes. The rootkit is designed for Linux kernel versions of 6 and above, and was tested until version 6.11.
 
-![caraxes logo](caraxes_logo.svg)
+<ins>__Important Disclaimer__</ins>: Caraxes is purely for educational and academic purposes. The software is provided "as is" and the authors are not responsible for any damage or mishaps that may occur during its use. Do not attempt to use Caraxes to violate the law. Misuse of the provided software and information may result in criminal charges.
 
-## Features
+<p align="center"><img src="https://raw.githubusercontent.com/ait-aecid/caraxes/refs/heads/main/caraxes_logo.svg" width=25% height=25%></p>
 
-* Hide files & directores
-* Hide processes
+If you use any of the resources provided in this repository, please cite the following publication:
+* Landauer, M., Alton, L., Lindorfer, M., Skopik, F., Wurzenberger, M., & Hotwagner, W. (2025). Trace of the Times: Rootkit Detection through Temporal Anomalies in Kernel Activity. Under Review.
 
 ## Configuration
 
@@ -70,3 +70,8 @@ Do not attempt to use Caraxes to violate the law. Misuse of the provided softwar
 - **Diamorphine**: `linux_dirent` element removal code from [Diamorphine](https://github.com/m0nad/Diamorphine)
 - `ftrace_helper.h`: https://github.com/ilammy/ftrace-hook, edited to fit as a library instead of a standalone rootkit.
 - https://xcellerator.github.io/posts/linux_rootkits_01/, got me into rootkits and helped me gain most of the knowledge to make this. Much of the code is inspired by the code found here.
+
+# Citation
+
+If you use any of the resources provided in this repository, please cite the following publication:
+* Landauer, M., Alton, L., Lindorfer, M., Skopik, F., Wurzenberger, M., & Hotwagner, W. (2025). Trace of the Times: Rootkit Detection through Temporal Anomalies in Kernel Activity. Under Review.
