@@ -30,13 +30,18 @@ To test the rootkit, try to run `ls` in the directory - you should see several f
 
 ```sh
 ubuntu@ubuntu:~/caraxes$ ls
-LICENSE  Makefile  Module.symvers  README.md  caraxes.c  caraxes.ko  caraxes.mod  caraxes.mod.c  caraxes.mod.o  caraxes.o  caraxes_logo.svg  ftrace_helper.h  hooks.h  hooks_filldir.h  hooks_getdents64.h  modules.order  rootkit.h  stdlib.h
+LICENSE         README.md   caraxes.mod    caraxes.o         hooks.h             modules.order
+Makefile        caraxes.c   caraxes.mod.c  caraxes_logo.svg  hooks_filldir.h     rootkit.h
+Module.symvers  caraxes.ko  caraxes.mod.o  ftrace_helper.h   hooks_getdents64.h  stdlib.h
 ubuntu@ubuntu:~/caraxes$ sudo insmod caraxes.ko
 ubuntu@ubuntu:~/caraxes$ ls
-LICENSE  Makefile  Module.symvers  README.md  ftrace_helper.h  hooks.h  hooks_filldir.h  hooks_getdents64.h  modules.order  rootkit.h  stdlib.h
+LICENSE   Module.symvers  ftrace_helper.h  hooks_filldir.h     modules.order  stdlib.h
+Makefile  README.md       hooks.h          hooks_getdents64.h  rootkit.h
 ubuntu@ubuntu:~/caraxes$ sudo rmmod caraxes
 ubuntu@ubuntu:~/caraxes$ ls
-LICENSE  Makefile  Module.symvers  README.md  caraxes.c  caraxes.ko  caraxes.mod  caraxes.mod.c  caraxes.mod.o  caraxes.o  caraxes_logo.svg  ftrace_helper.h  hooks.h  hooks_filldir.h  hooks_getdents64.h  modules.order  rootkit.h  stdlib.h
+LICENSE         README.md   caraxes.mod    caraxes.o         hooks.h             modules.order
+Makefile        caraxes.c   caraxes.mod.c  caraxes_logo.svg  hooks_filldir.h     rootkit.h
+Module.symvers  caraxes.ko  caraxes.mod.o  ftrace_helper.h   hooks_getdents64.h  stdlib.h
 ubuntu@ubuntu:~/caraxes$ make clean
 ```
 
