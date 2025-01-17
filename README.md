@@ -11,7 +11,7 @@ If you use any of the resources provided in this repository, please cite the fol
 
 ## Installation
 
-First, install the following dependencies. Make sure to install the correct header libraries for your kernel: `linux-headers-$(uname -r)` should work on debian-like systems (see code below). On arch-like systems try `pacman -S linux-headers` / `pacman -S linux-zen-headers` instead.
+First, install the following dependencies. Make sure to install the correct header libraries for your kernel: `linux-headers-$(uname -r)` should work on debian-like systems (see code below). On arch-like systems try `pacman -S linux-headers` or `pacman -S linux-zen-headers` instead.
 
 ```sh
 ubuntu@ubuntu:~$ sudo apt update
