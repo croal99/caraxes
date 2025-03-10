@@ -64,7 +64,7 @@ ubuntu@ubuntu:~/caraxes$ sudo apt remove linux-headers-*
 ubuntu@ubuntu:~/caraxes$ sudo apt install linux-headers-$(uname -r)
 ```
 
-The default kernel versions on Ubuntu 22.04 do not work, we therefore recommend to use kernel version 6.2.0-25 and 5.19.0-50 where we successfully tested compiling the rootkit.
+The default kernel versions on Ubuntu 22.04 do not work, we therefore recommend to use kernel version 6.2.0-25 and 5.19.0-50 where we successfully tested compiling the rootkit. On Ubuntu 24.04, kernel version 6.8.0-35 was tested successfully.
 
 If you want to extend the code, the easiest way is to debug the code is to uncomment the calls to `rk_info` and `printk` or add your own, then monitor dmesg on insert / remove with `sudo dmesg -w`.
 
