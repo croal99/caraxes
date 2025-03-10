@@ -23,7 +23,7 @@ Second, download and compile the rootkit from this repository.
 ```sh
 ubuntu@ubuntu:~$ git clone https://github.com/ait-aecid/caraxes.git
 ubuntu@ubuntu:~$ cd caraxes/
-ubuntu@ubuntu:~/caraxes$ sudo make
+ubuntu@ubuntu:~/caraxes$ make
 ```
 
 To test the rootkit, try to run `ls` in the directory - you should see several files as depicted below. Run `sudo insmod caraxes.ko` to load the rootkit into the kernel. Now, run `ls` again - all files that contain the magic word "caraxes" are hidden from the user. To make the files visible, just remove the rootkit from the kernel using `sudo rmmod caraxes`.
@@ -63,6 +63,8 @@ In case that you run into problems when installing the kernel header libraries, 
 ubuntu@ubuntu:~/caraxes$ sudo apt remove linux-headers-*
 ubuntu@ubuntu:~/caraxes$ sudo apt install linux-headers-$(uname -r)
 ```
+
+The default kernel versions on Ubuntu 22.04 do not work, we therefore recommend to use kernel version 6.2.0-25 and 5.19.0-50 where we successfully tested compiling the rootkit.
 
 If you want to extend the code, the easiest way is to debug the code is to uncomment the calls to `rk_info` and `printk` or add your own, then monitor dmesg on insert / remove with `sudo dmesg -w`.
 
