@@ -1,6 +1,9 @@
 # CARAXES - Linux Kernel Module Rootkit
 
-This repository contains the Linux kernel module (LKM) rootkit CARAXES, which stands for Cyber Analytics Rootkit for Automated and eXploratory Evaluation Scenarios. The rootkit can be used to hide files, directories, and processes. In addition, we use the rootkit to evaluate anomaly detection approaches based on kernel function timings - check out [this repository](https://github.com/ait-aecid/rootkit-detection-ebpf-time-trace) for details. The rootkit is designed for Linux kernel versions of 6 and above, and was tested with kernel versions 5.14-6.11.
+CARAXES - ***C**yber **A**nalytics **R**ootkit for **A**utomated and e**X**ploratory **E**valuation **S**cenarios* - is a Linux Kernel Module (LKM) rootkit.
+It can be used to hide processes and files on a pwned machine to cover further activities.
+Caraxes was developted for Linux versions 6 and up, and has been tested for 5.14-6.11.
+The rootkit was born to evaluate anomaly detection approaches based on kernel function timings - check out [this repository](https://github.com/ait-aecid/rootkit-detection-ebpf-time-trace) for details.
 
 <p align="center"><img src="https://raw.githubusercontent.com/ait-aecid/caraxes/refs/heads/main/caraxes_logo.svg" width=25% height=25%></p>
 
