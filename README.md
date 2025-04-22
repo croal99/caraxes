@@ -54,15 +54,6 @@ We implemented different versions to test our [rootkit detection](https://github
 
 Keep in mind that if you unlink the module from the modules list (uncommenting of `hide_module()`), then `rmmod` will not find it and you will have to somehow signal to the rootkit to unhide itself with `show_module()`. If you get into that situation and the unhide does not work, or the kernel module crashed on `rmmod`or similar, a system restart should always do the trick.
 
-In case that you run into problems when installing the kernel header libraries, try to uninstall all headers and only install the ones for your kernel.
-
-```sh
-ubuntu@ubuntu:~/caraxes$ sudo apt remove linux-headers-*
-ubuntu@ubuntu:~/caraxes$ sudo apt install linux-headers-$(uname -r)
-```
-
-The default kernel versions on Ubuntu 22.04 do not work, we therefore recommend to use kernel version 6.2.0-25 and 5.19.0-50 where we successfully tested compiling the rootkit. On Ubuntu 24.04, kernel version 6.8.0-35 was tested successfully.
-
 If you want to extend the code, the easiest way is to debug the code is to uncomment the calls to `rk_info` and `printk` or add your own, then monitor dmesg on insert / remove with `sudo dmesg -w`.
 
 ## Missing Features: Open Ports
