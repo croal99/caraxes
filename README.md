@@ -36,7 +36,7 @@ Remove it via `rmmod caraxes` , given it is not hidden (see `hide_module()`).
 ### Try it out
 
 If you loaded the rootkit on your local system in your curent working directory, try listing the files - many of them should be gone,
-because the standard magic-string for files to hide is `caraxes`.
+because the standard magic-string for files to hide is "caraxes".
 
 ## Configuration
 
