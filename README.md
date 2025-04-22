@@ -15,19 +15,12 @@ If you use any of the resources provided in this repository, please cite the fol
 
 ## Compilation
 
-First, install the following dependencies. Make sure to install the correct header libraries for your kernel: `linux-headers-$(uname -r)` should work on debian-like systems (see code below). On arch-like systems try `pacman -S linux-headers` or `pacman -S linux-zen-headers` instead.
+Install the kernel headers (`apt install linux-headers-$(uname -r)` / `yum installkernel-headers` / `pacman -S linux-headers`).
 
 ```sh
-ubuntu@ubuntu:~$ sudo apt update
-ubuntu@ubuntu:~$ sudo apt install python3-bpfcc make gcc flex bison linux-headers-$(uname -r)
-```
-
-Second, download and compile the rootkit from this repository.
-
-```sh
-ubuntu@ubuntu:~$ git clone https://github.com/ait-aecid/caraxes.git
-ubuntu@ubuntu:~$ cd caraxes/
-ubuntu@ubuntu:~/caraxes$ make
+$ git clone https://github.com/ait-aecid/caraxes.git
+$ cd caraxes/
+$ make
 ```
 
 This gives you the `caraxes.ko` koernelobject file, whichcan be loaded via `insmod caraxes.ko`.
