@@ -1,8 +1,9 @@
 # CARAXES - Linux Kernel Module Rootkit
 
 CARAXES - ***C**yber **A**nalytics **R**ootkit for **A**utomated and **X**ploratory **E**valuation **S**cenarios* - is a Linux Kernel Module (LKM) rootkit.
-It can be used to hide processes and files on a pwned machine to cover further activities.
-Caraxes was developted for Linux versions 6 and up, and has been tested for 5.14-6.11.
+The purpose is to hide processes and files on a system, this can be done via user/group ownership or a magic-sting in the filename.
+Caraxes was developted for Linux versions 6 and up, and has been tested for 5.14-6.11,
+it uses [ftrace-hooking ](https://github.com/ilammy/ftrace-hook) at its core.
 The rootkit was born to evaluate anomaly detection approaches based on kernel function timings - check out [this repository](https://github.com/ait-aecid/rootkit-detection-ebpf-time-trace) for details.
 
 <p align="center"><img src="https://raw.githubusercontent.com/ait-aecid/caraxes/refs/heads/main/caraxes_logo.svg" width=25% height=25%></p>
