@@ -28,8 +28,24 @@ Remove it via `rmmod caraxes` , given it is not hidden (see `hide_module()`).
 
 ### Try it out
 
-If you loaded the rootkit on your local system in your current working directory, try listing the files - many of them should be gone,
-because the standard magic-string for files to hide is "caraxes".
+To test the rootkit, try to run `ls` in the directory - you should see several files as depicted below. Run `sudo insmod caraxes.ko` to load the rootkit into the kernel. Now, run `ls` again - all files that contain the magic word "caraxes" are hidden from the user. To make the files visible, just remove the rootkit from the kernel using `sudo rmmod caraxes`.
+
+```sh
+ubuntu@ubuntu:~/caraxes$ ls
+LICENSE         README.md   caraxes.mod    caraxes.o         hooks.h             modules.order
+Makefile        caraxes.c   caraxes.mod.c  caraxes_logo.svg  hooks_filldir.h     rootkit.h
+Module.symvers  caraxes.ko  caraxes.mod.o  ftrace_helper.h   hooks_getdents64.h  stdlib.h
+ubuntu@ubuntu:~/caraxes$ sudo insmod caraxes.ko
+ubuntu@ubuntu:~/caraxes$ ls
+LICENSE   Module.symvers  ftrace_helper.h  hooks_filldir.h     modules.order  stdlib.h
+Makefile  README.md       hooks.h          hooks_getdents64.h  rootkit.h
+ubuntu@ubuntu:~/caraxes$ sudo rmmod caraxes
+ubuntu@ubuntu:~/caraxes$ ls
+LICENSE         README.md   caraxes.mod    caraxes.o         hooks.h             modules.order
+Makefile        caraxes.c   caraxes.mod.c  caraxes_logo.svg  hooks_filldir.h     rootkit.h
+Module.symvers  caraxes.ko  caraxes.mod.o  ftrace_helper.h   hooks_getdents64.h  stdlib.h
+ubuntu@ubuntu:~/caraxes$ make clean
+```
 
 ## Configuration
 
