@@ -23,8 +23,7 @@ $ cd caraxes/
 $ make
 ```
 
-This gives you the `caraxes.ko` koernelobject file, which can be loaded via `insmod caraxes.ko`.
-Remove it via `rmmod caraxes` , given it is not hidden (see `hide_module()`).
+This gives you the `caraxes.ko` kernelobject file, which can be loaded via `insmod caraxes.ko`. Remove it via `rmmod caraxes`, given it is not hidden (see `hide_module()`).
 
 ### Try it out
 
