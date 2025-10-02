@@ -117,7 +117,7 @@ if [[ ! -f "$MODULE_DIR/Makefile" ]]; then
   exit 3
 fi
 
-echo "开始为内核版本: ${KVER} 在主机上编译 caraxes 模块"
+echo "开始为内核版本: ${KVER} 在主机上编译 crystal 模块"
 echo "使用头文件目录: $KDIR"
 
 if [[ "$CLEAN_FIRST" -eq 1 ]]; then
@@ -126,8 +126,8 @@ fi
 
 make -C "$KDIR" M="$MODULE_DIR" modules
 
-if [[ -f "$MODULE_DIR/caraxes.ko" ]]; then
-  echo "完成: 已为 ${KVER} 编译模块 -> $MODULE_DIR/caraxes.ko"
+if [[ -f "$MODULE_DIR/crystal.ko" ]]; then
+  echo "完成: 已为 ${KVER} 编译模块 -> $MODULE_DIR/crystal.ko"
 else
-  echo "警告: 编译结束但未找到 caraxes.ko，请检查输出与错误信息。" >&2
+  echo "警告: 编译结束但未找到 crystal.ko，请检查输出与错误信息。" >&2
 fi

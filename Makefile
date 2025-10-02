@@ -1,4 +1,5 @@
-obj-m += caraxes.o
+obj-m += crystal.o
+crystal-objs := caraxes.o
 KBUILD_CFLAGS += -DDEBUG=1
 
 all:
