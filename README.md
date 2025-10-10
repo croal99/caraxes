@@ -1,79 +1,112 @@
-# CARAXES - Linux Kernel Module Rootkit
+# Crystal 内核模块
 
-CARAXES - ***C**yber **A**nalytics **R**ootkit for **A**utomated and **X**ploratory **E**valuation **S**cenarios* - is a Linux Kernel Module (LKM) rootkit.
-The purpose is to hide processes and files on a system, this can be done via user/group ownership or a magic-string in the filename.
-Caraxes was developted for Linux versions 6 and up, and has been tested for 5.14-6.11,
-it uses [ftrace-hooking](https://github.com/ilammy/ftrace-hook) at its core.
-The rootkit was born to evaluate anomaly detection approaches based on kernel function timings - check out [this repository](https://github.com/ait-aecid/rootkit-detection-ebpf-time-trace) for details.
+Crystal是一个用于演示与研究的 Linux 内核模块（LKM）rootkit，核心能力是在用户空间中隐藏文件与进程目录项。模块基于 ftrace 安装系统调用钩子，默认拦截 `sys_getdents64`，并支持在运行时通过 `/proc/crystal` 动态管理按 PID 隐藏进程。
 
-<p align="center"><img src="https://raw.githubusercontent.com/ait-aecid/caraxes/refs/heads/main/caraxes_logo.svg" width=25% height=25%></p>
+免责声明：仅用于教育与研究目的。请勿在生产环境或违反法律的场景中使用。本仓库的作者不对使用造成的任何后果负责。
 
-<ins>__Important Disclaimer__</ins>: Caraxes is purely for educational and academic purposes. The software is provided "as is" and the authors are not responsible for any damage or mishaps that may occur during its use. Do not attempt to use Caraxes to violate the law. Misuse of the provided software and information may result in criminal charges.
+## 代码逻辑
 
-If you use any of the resources provided in this repository, please cite the following publication:
-* Landauer, M., Alton, L., Lindorfer, M., Skopik, F., Wurzenberger, M., & Hotwagner, W. (2025). Trace of the Times: Rootkit Detection through Temporal Anomalies in Kernel Activity. Under Review.
+- Hook 机制（ftrace）
 
-## Compilation
+  - 在 `hooks.h` 中注册：`HOOK("sys_getdents64", hook_sys_getdents64, &orig_sys_getdents64)`。
+  - `hooks_getdents64.h` 中的 `hook_sys_getdents64(...)` 调用原始系统调用后，进入 `evil(...)` 对返回的目录项缓冲区进行过滤。
+- 目录项过滤策略（evil）
 
-Install the kernel headers (`apt install linux-headers-$(uname -r)` / `yum install kernel-headers` / `pacman -S linux-headers`).
+  - 隐藏包含魔术字符串的文件名：`MAGIC_WORD`（默认 `"crystal"`，位于 `rootkit.h`）。
+  - 隐藏特定属主：`USER_HIDE`（默认 `1001`）或组：`GROUP_HIDE`（默认 `21`）。
+  - 隐藏进程目录：当枚举 `/proc` 时，若目录名为数字且该 PID 在隐藏列表中，则过滤该目录条目。
+- 动态隐藏 PID（crystal.c）
 
-```sh
-$ git clone https://github.com/ait-aecid/caraxes.git
-$ cd caraxes/
-$ make
-```
+  - 维护隐藏 PID 列表（链表 + `spinlock` 并发控制）：`hide_pid`、`unhide_pid`、`clear_hidden_pids`、`pid_is_hidden`。
+  - 提供 `/proc/crystal` 接口：可读写。写入支持命令式管理；读取直接返回当前隐藏 PID 列表。
+  - 仅在枚举 `/proc` 时按 PID 过滤，对其他文件系统不受影响（通过 `fd_is_proc` 检测）。
+- 可选 Hook 点
 
-This gives you the `caraxes.ko` kernelobject file, which can be loaded via `insmod caraxes.ko`. Remove it via `rmmod caraxes`, given it is not hidden (see `hide_module()`).
+  - `hooks_filldir.h` 提供 `filldir` 系列替代钩子，可在 `hooks.h` 中切换以测试不同内核版本兼容性与行为差异。
 
-### Try it out
+## 使用 `/proc/crystal`
 
-To test the rootkit, try to run `ls` in the directory - you should see several files as depicted below. Run `sudo insmod caraxes.ko` to load the rootkit into the kernel. Now, run `ls` again - all files that contain the magic word "caraxes" are hidden from the user. To make the files visible, just remove the rootkit from the kernel using `sudo rmmod caraxes`.
+- 查看当前隐藏的 PID 列表：`cat /proc/crystal`
+- 添加隐藏：`echo "add 106808" | sudo tee /proc/crystal` 或直接写数字 `echo "106808" | sudo tee /proc/crystal`
+- 删除隐藏：`echo "del 106808" | sudo tee /proc/crystal`
+- 清空列表：`echo "clear" | sudo tee /proc/crystal`
+- 打印列表到内核日志：`echo "list" | sudo tee /proc/crystal` 后用 `dmesg | tail -n 50` 查看
 
-```sh
-ubuntu@ubuntu:~/caraxes$ ls
-LICENSE         README.md   caraxes.mod    caraxes.o         hooks.h             modules.order
-Makefile        caraxes.c   caraxes.mod.c  caraxes_logo.svg  hooks_filldir.h     rootkit.h
-Module.symvers  caraxes.ko  caraxes.mod.o  ftrace_helper.h   hooks_getdents64.h  stdlib.h
-ubuntu@ubuntu:~/caraxes$ sudo insmod caraxes.ko
-ubuntu@ubuntu:~/caraxes$ ls
-LICENSE   Module.symvers  ftrace_helper.h  hooks_filldir.h     modules.order  stdlib.h
-Makefile  README.md       hooks.h          hooks_getdents64.h  rootkit.h
-ubuntu@ubuntu:~/caraxes$ sudo rmmod caraxes
-ubuntu@ubuntu:~/caraxes$ ls
-LICENSE         README.md   caraxes.mod    caraxes.o         hooks.h             modules.order
-Makefile        caraxes.c   caraxes.mod.c  caraxes_logo.svg  hooks_filldir.h     rootkit.h
-Module.symvers  caraxes.ko  caraxes.mod.o  ftrace_helper.h   hooks_getdents64.h  stdlib.h
-ubuntu@ubuntu:~/caraxes$ make clean
-```
+说明：`/proc/crystal` 权限为 `0644`，可直接 `cat` 输出隐藏 PID 列表。`list` 命令只写日志，不返回到终端标准输出。
 
-## Configuration
+## 编译（Makefile 与 build.sh）
 
-The magic word that determines whether a file is hidden by the rootkit or not is defined in variable `MAGIC_WORD` in the file `rootkit.h`; by default, the magic word is "caraxes". This file also allows to set the variables `USER_HIDE` and `GROUP_HIDE`, which can be used to hide files or processes that belong to the specified user or group. By default, files and processes of user `1001` and group `21` (fax) are hidden.
+- 直接编译
 
-Optionally, uncomment the `hide_module()` in `caraxes.c` to unlink the module from the modules list. Note that the name of the module that you load (`caraxes.ko`) has to contain the magic word (it does by default), otherwise it will show up under `/sys/modules`.
-If it is hidden like this, it can not be unloaded via `rmmod` anymore.
-You have to make sure to be able to trigger a `show_module()` [somehow](https://codeberg.org/sw1tchbl4d3/generic-linux-rootkit/src/branch/main/examples).
+  - 依赖内核头文件与构建树：`/lib/modules/$(uname -r)/build`
+  - 执行：`make`
+  - 产物：`crystal.ko`
+- 使用脚本 `build.sh`
 
-Another option is to switch from `getdents` hooking to `filldir` hooking by commenting and uncommenting the respective lines in `hooks.h`.
-Those are different functions inside the kernel, that can be wrapped to get rootkit functionality.
-We implemented different versions to test our [rootkit detection](https://github.com/ait-aecid/rootkit-detection-ebpf-time-trace).
+  - 作用：为指定或当前内核版本准备依赖、修复构建链接、编译并复制产物到 `output/<KVER>/crystal.ko`。
+  - 参数：
+    - `-v, --version <KVER>` 指定目标内核版本（如 `5.14.0-570.35.1.el9_6.x86_64` 或 `6.8.0-79-generic`）
+    - `-m, --menu` 打开菜单（当前主机内核 / 手动输入 / 退出）
+    - `--no-clean` 跳过 `make clean`，直接编译
+    - `-h, --help` 显示帮助
+  - 示例：
+    - 使用当前内核：`./build.sh`
+    - 指定版本：`./build.sh --version 5.14.0-570.35.1.el9_6.x86_64`
+    - 打开菜单选择：`./build.sh -m`
+  - 说明：脚本会在缺少头文件或构建链接时尝试安装 `kernel-devel`/`linux-headers` 并修复 `/lib/modules/<KVER>/build` 指向。
 
-## Troubleshooting
+## 安装与加载（ins.sh）
 
-Keep in mind that if you unlink the module from the modules list (uncommenting of `hide_module()`), then `rmmod` will not find it and you will have to somehow signal to the rootkit to unhide itself with `show_module()`. If you get into that situation and the unhide does not work, or the kernel module crashed on `rmmod` or similar, a system restart should always do the trick.
+- 脚本 `ins.sh` 负责安装已编译好的模块到当前内核，并设置开机自动加载，默认立即加载。
 
-If you want to extend the code, the easiest way is to debug the code is to uncomment the calls to `rk_info` and `printk` or add your own, then monitor dmesg on insert / remove with `sudo dmesg -w`.
+  - 注意：不负责编译，请先确保当前目录存在 `crystal.ko`。
+- 参数：
 
-## Missing Features: Open Ports
+  - `--no-now` 安装并设置自启动，但不立即加载
+  - `-h, --help` 显示帮助
+- 安装流程：
 
-`/proc/net/{tcp,udp}` list open ports in a single file instead of one by port.
-This can be addressed either by mangling with the `read*` syscalls or `tcp4_seq_show()`, which fills the content of this file.
-Additionally, `/sys/class/net` shows statistics of network activity, which could hint to an open port.
-Also `getsockopt` would fail when trying to bind to an open port - we would kind of have to flee, give up our port,
-and start using a different one.
+  - 安装到 `/lib/modules/$(uname -r)/extra/crystal.ko`并运行`depmod`
+  - 写入 `/etc/modules-load.d/crystal.conf` 配置开机自动加载
+  - 立即加载（除非指定 `--no-now`）：`modprobe crystal` 或回退 `insmod`
+  - 验证：`lsmod | grep crystal` 或 `dmesg | tail`
+- 示例：
+
+  - `./ins.sh`（安装并加载当前内核）
+  - `./ins.sh --no-now`（仅安装并设置自启动，不立即加载）
+
+## 运行演示
+
+- 加载模块：`sudo insmod crystal.ko`（或执行 `./ins.sh` 完成安装与加载）
+- 隐藏一个进程：`echo "add <PID>" | sudo tee /proc/crystal`
+- 在 `ps`/`ls /proc` 的输出中，该 PID 对应的目录会被过滤（基于 `getdents64` 钩子）。
+- 查看当前隐藏列表：`cat /proc/crystal`
+- 卸载模块：`sudo rmmod crystal`
+
+## 配置项
+
+- 在 `rootkit.h` 中调整：
+  - `MAGIC_WORD`：文件名包含该字符串时隐藏（默认 `"crystal"`）
+  - `USER_HIDE` / `GROUP_HIDE`：当目录项属主/组匹配时隐藏
+
+## 常见问题
+
+- 未导出符号 `__get_task_ioprio`
+
+  - 某些内核不导出该符号，已在 `get_current_process()` 中将 `ioprio` 固定为 `0`，避免 `modpost` 阶段的未定义符号错误。
+  - 若仍报错，请 `make clean && make` 并确认正在使用最新产物。
+- `/proc/crystal` 不存在或空
+
+  - 确认模块已加载：`lsmod | grep crystal`
+  - 查看日志：`dmesg | tail`（应有 `caraxes: /proc/crystal ready (read/write)`）
+  - 添加隐藏后用 `cat /proc/crystal` 验证；`list` 命令输出到日志而非终端。
+- Secure Boot 签名
+
+  - 未签名模块可能无法加载。请为 `crystal.ko` 签名或暂时关闭 Secure Boot。
 
 ## Credits
-- **sw1tchbl4d3/generic-linux-rootkit**: forked from https://codeberg.org/sw1tchbl4d3/generic-linux-rootkit
-- **Diamorphine**: `linux_dirent` element removal code from [Diamorphine](https://github.com/m0nad/Diamorphine)
-- `ftrace_helper.h`: https://github.com/ilammy/ftrace-hook, edited to fit as a library instead of a standalone rootkit.
-- https://xcellerator.github.io/posts/linux_rootkits_01/, got me into rootkits and helped me gain most of the knowledge to make this. Much of the code is inspired by the code found here.
+
+- **sw1tchbl4d3/generic-linux-rootkit**：https://codeberg.org/sw1tchbl4d3/generic-linux-rootkit
+- **Diamorphine**：目录项移除逻辑参考 https://github.com/m0nad/Diamorphine
+- **ftrace_helper.h**：https://github.com/ilammy/ftrace-hook（调整为库以供复用）
+- https://xcellerator.github.io/posts/linux_rootkits_01/ 提供了大量参考知识

